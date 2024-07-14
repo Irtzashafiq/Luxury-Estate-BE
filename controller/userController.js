@@ -1,39 +1,50 @@
 const joi = require("joi");
-const user = require("../models/user");
+const user = require("../models/userModel");
 
 const createUserSchema = joi.object().keys({
   username: joi.string().required(),
   email: joi.string().email().required(),
   password: joi.string().min(6).max(20).required(),
+  contactInfo: joi.string(),
   confirmPassword: joi.ref("password"),
 });
 const updateUserSchema = joi.object().keys({
   username: joi.string().required(),
   email: joi.string().email().required(),
-  password: joi.string().min(6).max(20).required(),
+  contactInfo: joi.string(),
 });
 module.exports = {
   createUser: async (req, res) => {
     try {
       const { email } = req.body;
+
       const validate = await createUserSchema.validateAsync(req.body);
       const existingUser = await user.findOne({ email });
-
       var userCreated;
-      if (!existingUser) {
-        userCreated = await user.create(validate);
-      }
+      const image = req.file.path;
       if (existingUser) {
         return res.send({
           message: "User already exist!",
           response: existingUser,
         });
       }
-      if (userCreated.error) {
+      if (req.body.password !== req.body.confirmPassword) {
         return res.send({
-          error: userCreated.error,
+          message: "password not matched",
         });
       }
+      const users = new user({
+        username: validate.username,
+        email: validate.email,
+        password: validate.password,
+        contactInfo: validate.contactInfo,
+        image: image,
+      });
+
+      if (!existingUser) {
+        userCreated = await user.create(users);
+      }
+
       return res.send({
         message: "User created successfully",
         response: userCreated,

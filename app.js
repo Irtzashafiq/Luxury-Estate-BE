@@ -3,7 +3,8 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-const mongoose = require("mongoose");
+var cors = require("cors");
+var mongoose = require("mongoose");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -24,10 +25,18 @@ connection.once("open", () => {
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
+app.use("/uploads", express.static("uploads"));
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(
+  cors({
+    //without cors it throws some behaviour issues
+    credentials: true,
+    origin: true, // it allows communication between different origins like front end or backend
+  })
+);
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
