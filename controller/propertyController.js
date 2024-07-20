@@ -10,32 +10,18 @@ module.exports = {
     }
   },
 
-  //   getPropertyByCity: async (req, res) => {
-  //     const { cityId } = req.params;
-  //     const { minPrice, maxPrice } = req.query; // Extract minPrice and maxPrice from query parameters
+  getPropertyByAgency: async (req, res) => {
+    try {
+      const { id } = req.query;
+      const filter = { agency_id: id };
+      console.log(id);
+      const properties = await Property.find(filter);
 
-  //     // Create a filter object to be used in the Property.find() query
-  //     const filter = { cityId: cityId };
-  //     if (minPrice && maxPrice) {
-  //       if (minPrice !== undefined && !isNaN(minPrice)) {
-  //         filter.price = { $gte: parseFloat(minPrice) };
-  //       }
-  //       if (maxPrice !== undefined && !isNaN(maxPrice)) {
-  //         if (filter.price) {
-  //           filter.price.$lte = parseFloat(maxPrice);
-  //         } else {
-  //           filter.price = { $lte: parseFloat(maxPrice) };
-  //         }
-  //       }
-  //     }
-
-  //     try {
-  //       const properties = await Property.find(filter);
-  //       res.json(properties);
-  //     } catch (error) {
-  //       res.send({ message: error.message });
-  //     }
-  //   },
+      res.send(properties);
+    } catch (error) {
+      res.send({ message: error.message });
+    }
+  },
 
   //   getPropertyrent: async (req, res) => {
   //     try {

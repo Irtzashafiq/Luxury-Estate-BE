@@ -23,7 +23,14 @@ const propertySchema = new mongoose.Schema(
     },
     propertyType: {
       type: String,
-      enum: ["house", "flat", "room", "residencial plot", "commercial plot"],
+      enum: [
+        "house",
+        "flat",
+        "room",
+        "residencial plot",
+        "commercial plot",
+        "banglo",
+      ],
       required: true,
     },
     agency_id: { type: mongoose.Schema.Types.ObjectId, ref: "Agency" },
