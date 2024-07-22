@@ -111,10 +111,23 @@ module.exports = {
       res.send({ message: error.message });
     }
   },
+
   updateProperty: async (req, res) => {
     try {
       const { id } = req.query;
-      const { title, location, price, size, bedrooms, type, file } = req.body;
+      const {
+        title,
+        location,
+        price,
+        size,
+        bedrooms,
+        propertyType,
+        bathrooms,
+        file,
+        phone,
+        buyOrRent,
+        cityId,
+      } = req.body;
 
       // Find the property to update
       const property = await Property.findById(id);
@@ -128,8 +141,15 @@ module.exports = {
       property.price = price;
       property.size = size;
       property.bedrooms = bedrooms;
-      property.type = type;
+      property.bathrooms = bathrooms;
+      property.propertyType = propertyType;
+      property.buyOrRent = buyOrRent;
+      property.phone = phone;
       property.file = file;
+      property.cityId = cityId;
+      if (req.file !== undefined) {
+        property.image = req.file.path;
+      }
 
       const updatedProperty = await property.save();
       res.send(updatedProperty);

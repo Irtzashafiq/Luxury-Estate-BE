@@ -16,7 +16,7 @@ router.post("/addproperty", upload.single("image"), addProperty);
 router.get("/getAllProperty", getAllProperties);
 router.get("/getProperty:id", getPropertyById);
 router.get("/getPropertyByAgency:id", getPropertyByAgency);
-router.put("/updateProperty:id", updateProperty);
+router.put("/updateProperty:id", upload.single("image"), updateProperty);
 router.delete("/deleteProperty:id", deleteProperty);
 
 module.exports = router;
