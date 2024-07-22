@@ -1,12 +1,13 @@
 const Agency = require("../models/agencyModel");
 const joi = require("joi");
+const bcrypt = require("bcrypt");
 
 const createAgencySchema = joi.object().keys({
   username: joi.string().required(),
   email: joi.string().email().required(),
   password: joi.string().min(6).max(20).required(),
   contactInfo: joi.string(),
-  //   confirmPassword: joi.ref("password"),
+  confirmPassword: joi.ref("password"),
 });
 
 module.exports = {
@@ -25,14 +26,15 @@ module.exports = {
         });
       }
       if (req.file !== undefined) {
-        console.log(req.file, "========================");
         image = req.file.path;
       }
+
+      const hashedPassword = await bcrypt.hash(validate.password, 10);
 
       const agency = new Agency({
         username: validate.username,
         email: validate.email,
-        password: validate.password,
+        password: hashedPassword,
         contactInfo: validate.contactInfo,
         image: image,
       });
@@ -62,8 +64,8 @@ module.exports = {
           message: "Email Not Found",
         });
       }
-
-      if (password !== login.password) {
+      const isMatch = await bcrypt.compare(password, login.password);
+      if (!isMatch) {
         return res.send({
           message: "invalid credentrials",
         });

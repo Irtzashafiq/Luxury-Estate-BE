@@ -1,5 +1,6 @@
 // const auth = require("../controller/userController");
 const user = require("../models/userModel");
+const bcrypt = require("bcrypt");
 
 module.exports = {
   login: async (req, res) => {
@@ -13,7 +14,9 @@ module.exports = {
           message: "User Not Found",
         });
       }
-      if (password !== login.password) {
+      const isMatch = await bcrypt.compare(password, login.password);
+      console.log("Password Match:", isMatch);
+      if (!isMatch) {
         return res.send({
           message: "invalid credentrials",
         });

@@ -1,12 +1,13 @@
 const joi = require("joi");
 const user = require("../models/userModel");
+const bcrypt = require("bcrypt");
 
 const createUserSchema = joi.object().keys({
   username: joi.string().required(),
   email: joi.string().email().required(),
   password: joi.string().min(6).max(20).required(),
   contactInfo: joi.string(),
-  confirmPassword: joi.ref("password"), 
+  confirmPassword: joi.ref("password"),
 });
 const updateUserSchema = joi.object().keys({
   username: joi.string().required(),
@@ -16,34 +17,34 @@ const updateUserSchema = joi.object().keys({
 module.exports = {
   createUser: async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, password } = req.body;
 
       const validate = await createUserSchema.validateAsync(req.body);
+
       const existingUser = await user.findOne({ email });
-      var userCreated;
-      const image = req.file.path;
+
       if (existingUser) {
         return res.send({
           message: "User already exist!",
           response: existingUser,
         });
       }
+
       if (req.body.password !== req.body.confirmPassword) {
         return res.send({
           message: "password not matched",
         });
       }
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       const users = new user({
         username: validate.username,
         email: validate.email,
-        password: validate.password,
+        password: hashedPassword,
         contactInfo: validate.contactInfo,
-        image: image,
+        image: req.file ? req.file.path : null,
       });
-
-      if (!existingUser) {
-        userCreated = await user.create(users);
-      }
+      const userCreated = await users.save();
 
       return res.send({
         message: "User created successfully",
